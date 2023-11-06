@@ -1,0 +1,156 @@
+#include <stdio.h>
+#include <conio.h>
+#include <string.h>
+#include <unistd.h> 
+struct Perfil1{
+    float ingresos[50], gastos[50], saldo;
+    char transaccion_Ingreso[50][50], transaccion_Gasto[50][50];
+};
+struct Perfil1 Persona1; 
+    char usuario[30] = "Usuario123", contrasenia[30] = "Password456", usuario1[30], contrasenia1[30];
+    int intentos = 0, opcion1, opcion2, c;
+    int contadorTransacciones_Ingreso = 0, contadorTransacciones_Gasto = 0, contadorIngresos = 0, contadorGastos = 0;
+    
+void InicioDeSesion(){ 
+	while (intentos < 3) { 
+        printf("Ingrese su usuario: ");
+
+        fgets(usuario1, sizeof(usuario1), stdin); 
+        usuario1[strcspn(usuario1, "\n")] = '\0'; 
+
+        printf("Ingrese su contrasenia: ");
+        
+        fgets(contrasenia1, sizeof(contrasenia1), stdin); 
+        contrasenia1[strcspn(contrasenia1, "\n")] = '\0';
+
+        if (strcmp(usuario, usuario1) == 0 && strcmp(contrasenia, contrasenia1) == 0) {
+            printf("\nInicio de sesion exitoso!\n\nBIENVENIDO %s\nIniciando sesion (espere unos segundos)...\n", usuario);
+            sleep(3);
+            break;
+        }
+	else{
+            intentos++; 
+            printf("Usuario o contrasenia incorrectos. intento (%d/3)\n\n", intentos);
+            
+            if (intentos == 3){
+                printf("\nIntentos máximos alcanzados, bloqueo temporal de 20 segundos.\n");
+                sleep(20); 
+                intentos = 0; 
+            }
+        }
+    }
+}
+int main(){
+	printf("\tBanco Erep Obre S.A\n\n");
+	InicioDeSesion(); 
+	Persona1.saldo = 20500.00;
+	printf("\nSaldo actual: $%.2f\n", Persona1.saldo); /*mostramos su saldo al principio*/
+    do{
+        printf("\n  Banco Erep Obre S.A\n1) Realizar una transaccion\n2) historial de transacciones\n3) Salir de la aplicación.\nSeleccione una opción (1-3): "); //menú principal.
+		scanf("%d", &opcion1);
+
+        switch (opcion1) {
+            case 1:
+                printf("\n\tTransacciones\n");
+		        printf("Tipo de transacción\n1) Ingreso\n2) Gasto\n3) Regresar al menú\nSeleccione una opcion (1-3): "); 
+		        scanf("%d", &opcion2); 
+
+                if (opcion2 == 1) {
+                    while ((c = getchar()) != '\n' && c != EOF);
+			printf("\n\tINGRESOS\nIngrese el nombre de la transacción: ");
+                    fgets(Persona1.transaccion_Ingreso[contadorTransacciones_Ingreso], sizeof(Persona1.transaccion_Ingreso[contadorTransacciones_Ingreso]), stdin);
+                    Persona1.transaccion_Ingreso[contadorTransacciones_Ingreso][strcspn(Persona1.transaccion_Ingreso[contadorTransacciones_Ingreso], "\n")] = '\0';
+
+                    printf("Ingrese el monto que se ha ingresado: $");
+                    scanf("%f", &Persona1.ingresos[contadorIngresos]); 
+                    
+                    if (Persona1.ingresos[contadorIngresos] > 0){
+                        Persona1.saldo = Persona1.saldo + Persona1.ingresos[contadorIngresos]; 
+                        contadorTransacciones_Ingreso++;
+                        contadorIngresos++;
+                        printf("\n¡Transacción exitosa!\nSu nuevo saldo es: $%.2f\n", Persona1.saldo); 
+                    } else {
+                        printf("\n¡Transacción fallida! Datos invalidos :(\n");
+                        break;
+                    }
+                    
+                } else if (opcion2 == 2) {
+                    while ((c = getchar()) != '\n' && c != EOF);
+
+                    printf("\n\tGASTOS\nIngrese el nombre de la transacción: "); 
+                    fgets(Persona1.transaccion_Gasto[contadorTransacciones_Gasto], sizeof(Persona1.transaccion_Gasto[contadorTransacciones_Gasto]), stdin);
+                    Persona1.transaccion_Gasto[contadorTransacciones_Gasto][strcspn(Persona1.transaccion_Gasto[contadorTransacciones_Gasto], "\n")] = '\0';
+
+                    printf("Ingrese el monto que se ha gastado: $");
+                    scanf("%f", &Persona1.gastos[contadorGastos]);
+                    
+                    if(Persona1.gastos[contadorGastos] > 0){ 
+                    	if(Persona1.gastos[contadorGastos] <= Persona1.saldo){
+                    		Persona1.saldo = Persona1.saldo-Persona1.gastos[contadorGastos];
+							contadorTransacciones_Gasto++;
+							contadorGastos++;
+							printf("\n¡Transacción exitosa!\nSu nuevo saldo es: $%.2f\n", Persona1.saldo);
+						}
+						else{
+							printf("\n¡Transacción fallida! Su saldo no es suficiente.\n"); 
+						}
+                        
+                    }else{
+                        printf("\n¡Transacción fallida! Datos invalidos :(\n");
+                        break;
+                    }
+                    
+                }else if(opcion2 == 3){
+                    printf("\nRegresando al menú...\n"); 
+                    sleep(1.5);
+                }
+                else{
+                	printf("\nOpción inválida."); 
+                	break;
+				}
+                break;
+                
+            case 2:
+                printf("\n\n    Historial De transacciones\n1) Ver Resumen\n2) Volver al menú\n"); 
+                //Menú que permite al usuario o ingresar a ver su resumen de transacciones, o retroceder al menú.
+                printf("Escoga una opción (1/2): ");
+				scanf("%d", &opcion2);
+                if(opcion2 == 1){
+                	printf("\nIngresos:\n");
+                    for(int i = 0; i < contadorIngresos; i++){ 
+                        if(Persona1.ingresos[i] > 0){
+                            printf("  - Ingreso %d (%s): $%.2f\n", i + 1, Persona1.transaccion_Ingreso[i], Persona1.ingresos[i]);
+                        }
+                    }
+                    printf("\nGastos:\n");
+                    for(int i = 0; i < contadorGastos; i++){
+                        if(Persona1.gastos[i] > 0){
+                        printf("  - Gasto %d (%s): $%.2f\n", i + 1, Persona1.transaccion_Gasto[i], Persona1.gastos[i]);
+                        }
+                    }
+                    printf("\nSaldo actual: $%.2f\n", Persona1.saldo); 
+                    sleep(2); 
+				}
+				else if(opcion2 == 2){
+					printf("\nRegresando al menú...\n"); 
+                    sleep(1.5);
+				}
+				else{
+					printf("\nOpción inválida");
+					break;
+				}
+		    break;
+			
+			case 3:
+			    printf("\nSaliendo de la aplicación..."); 
+			    sleep(2); 
+				return 1; 
+			break;
+			
+			default:
+			    printf("\nError, opción o datos inválidos."); 
+        }
+    }while(opcion1 != 3);
+    getch();
+    return 0;
+}
